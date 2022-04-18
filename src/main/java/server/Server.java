@@ -29,18 +29,18 @@ public class Server {
 
     NioEventLoopGroup boss = new NioEventLoopGroup();
     NioEventLoopGroup worker = new NioEventLoopGroup();
-
     ServerBootstrap sb = new ServerBootstrap();
-    sb.group(boss, worker)
-        .channel(NioServerSocketChannel.class)
-        .childHandler(
-            new ChannelInitializer<NioSocketChannel>() {
-              protected void initChannel(NioSocketChannel ch) {
-                ch.pipeline().addLast(new Conn(connId));
-              }
-            });
 
+    sb.group(boss, worker);
+    sb.channel(NioServerSocketChannel.class);
+    sb.childHandler(
+        new ChannelInitializer<NioSocketChannel>() {
+          protected void initChannel(NioSocketChannel ch) {
+            ch.pipeline().addLast(new Conn(connId));
+          }
+        });
     sb.bind(this.port);
+
     this.sb = sb;
   }
 }

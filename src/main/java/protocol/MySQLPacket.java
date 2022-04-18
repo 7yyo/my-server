@@ -1,6 +1,7 @@
 package protocol;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import lombok.Data;
 import util.ByteUtil;
 
@@ -9,6 +10,15 @@ public class MySQLPacket {
 
   private int size;
   private ByteBuf data;
+
+  public static ByteBuf initByteBuf() {
+    ByteBuf b = ByteBufAllocator.DEFAULT.buffer();
+    b.writeByte(0);
+    b.writeByte(0);
+    b.writeByte(0);
+    b.writeByte(0);
+    return b;
+  }
 
   public void writePacketHeader(ByteBuf b) {
     int size = ByteUtil.toBytes(b).length;

@@ -10,9 +10,9 @@ import static com.mysql.cj.protocol.a.NativeServerSession.*;
 
 // https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
 @Data
-public class Auth extends MySQLPacket {
+public class AuthPacket extends MySQLPacket {
 
-  public Auth(ByteBuf byteBuf) {
+  public AuthPacket(ByteBuf byteBuf) {
     this.byteBuf = byteBuf;
   }
 

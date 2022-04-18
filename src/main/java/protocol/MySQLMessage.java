@@ -1,6 +1,9 @@
 package protocol;
 
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
+
+import java.nio.ByteBuffer;
 
 @Data
 public class MySQLMessage {
@@ -95,6 +98,31 @@ public class MySQLMessage {
         return read4();
       default:
         return length;
+    }
+  }
+
+  public static void writeLength(ByteBuf byteBuf, long l) {
+    if (l < 251) {
+      byteBuf.writeByte((byte) l);
+    } else if (l < 0x10000L) {
+      byteBuf.writeByte((byte) 252);
+      byteBuf.writeByte((byte) (l & 0xff));
+      byteBuf.writeByte((byte) (l >>> 8));
+    } else if (l < 0x1000000L) {
+      byteBuf.writeByte((byte) 253);
+      byteBuf.writeByte((byte) (l & 0xff));
+      byteBuf.writeByte((byte) (l >>> 8));
+      byteBuf.writeByte((byte) (l >>> 16));
+    } else {
+      byteBuf.writeByte((byte) 254);
+      byteBuf.writeByte((byte) (l & 0xff));
+      byteBuf.writeByte((byte) (l >>> 8));
+      byteBuf.writeByte((byte) (l >>> 16));
+      byteBuf.writeByte((byte) (l >>> 24));
+      byteBuf.writeByte((byte) (l >>> 32));
+      byteBuf.writeByte((byte) (l >>> 40));
+      byteBuf.writeByte((byte) (l >>> 48));
+      byteBuf.writeByte((byte) (l >>> 56));
     }
   }
 

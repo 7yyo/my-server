@@ -1,18 +1,15 @@
 package protocol.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
 import lombok.Data;
 import protocol.MySQLPacket;
-import util.ByteUtil;
 
 // https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
 @Data
-public class HandshakeV10 extends MySQLPacket {
+public class HandshakeV10Packet extends MySQLPacket {
 
   public static final int PROTOCOL_VERSION = 10;
-  public static final byte[] SERVER_VERSION = "server-version".getBytes();
+  public static final byte[] SERVER_VERSION = "5.7.25-MySQL-v6.1.0".getBytes();
 
   private byte protocolVersion; // protocol_version
   private byte[] serverVersion; // human-readable server version
@@ -30,7 +27,7 @@ public class HandshakeV10 extends MySQLPacket {
   private byte[] authPluginDataPart2; //  [len=8] first 8 bytes of the auth-plugin data
   private byte[] authPluginName; //  name of the auth_method that the auth_plugin_data belongs to
 
-  public HandshakeV10(
+  public HandshakeV10Packet(
       byte protocolVersion,
       byte[] serverVersion,
       long connectionId,
@@ -55,11 +52,8 @@ public class HandshakeV10 extends MySQLPacket {
 
   public void writePacket(long sequenceId) {
 
-    ByteBuf b = ByteBufAllocator.DEFAULT.buffer();
-    b.writeByte(0);
-    b.writeByte(0);
-    b.writeByte(0);
-    b.writeByte(0);
+    ByteBuf b = MySQLPacket.initByteBuf();
+
     b.writeByte(this.protocolVersion);
     b.writeBytes(this.serverVersion);
     b.writeByte((int) sequenceId);

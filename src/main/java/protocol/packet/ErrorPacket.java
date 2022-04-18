@@ -1,15 +1,11 @@
 package protocol.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 import protocol.MySQLPacket;
-import util.ByteUtil;
 
 @Data
-public class Err extends MySQLPacket {
+public class ErrorPacket extends MySQLPacket {
 
   private int header;
   private int errCode;
@@ -17,7 +13,8 @@ public class Err extends MySQLPacket {
   private byte[] sqlState;
   private byte[] errorMessage;
 
-  public Err(int header, int errCode, byte sqlStateMarker, byte[] sqlState, byte[] errorMessage) {
+  public ErrorPacket(
+      int header, int errCode, byte sqlStateMarker, byte[] sqlState, byte[] errorMessage) {
     this.header = header;
     this.errCode = errCode;
     this.sqlStateMarker = sqlStateMarker;
@@ -25,13 +22,10 @@ public class Err extends MySQLPacket {
     this.errorMessage = errorMessage;
   }
 
-  public void writeByteBuf() {
+  public void writePacket() {
 
-    ByteBuf b = ByteBufAllocator.DEFAULT.buffer();
-    b.writeByte(0);
-    b.writeByte(0);
-    b.writeByte(0);
-    b.writeByte(0);
+    ByteBuf b = MySQLPacket.initByteBuf();
+
     b.writerIndex(4);
     b.writeByte(this.header);
     b.writeByte(this.errCode & 0xff);
