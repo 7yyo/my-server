@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%p] [%M.java:%L] [%m]%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%p] [%M.java:%L] [%m]%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <file>./my-server.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>./my-server.log.%i</fileNamePattern>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>300MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <logger name="logger" level="INFO" additivity="true">
+        <appender-ref ref="log"/>
+    </logger>
+
+    <root level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

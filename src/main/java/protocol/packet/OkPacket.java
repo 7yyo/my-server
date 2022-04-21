@@ -2,6 +2,7 @@ package protocol.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
 import protocol.MySQLMessage;
 import protocol.MySQLPacket;
@@ -9,37 +10,50 @@ import protocol.MySQLPacket;
 @Data
 public class OkPacket extends MySQLPacket {
 
-  private static final byte HEADER = 0x00;
+    private static final byte HEADER = 0x00;
 
-  private byte header;
-  private int affectedRows;
-  private int lastInsertId;
-  private int statusFlag;
-  private int warnings;
-  private String info;
-  private String sessionStateChanges;
+    private byte header;
+    private int affectedRows;
+    private int lastInsertId;
+    private int statusFlag;
+    private int warnings;
+    private String info;
+    private String sessionStateChanges;
 
-  public OkPacket(int affectedRows, int lastInsertId, int statusFlag, int warnings, String info) {
-    this.affectedRows = affectedRows;
-    this.lastInsertId = lastInsertId;
-    this.statusFlag = statusFlag;
-    this.warnings = warnings;
-    this.info = info;
-  }
+    public OkPacket(int affectedRows, int lastInsertId, int statusFlag, int warnings, String info) {
+        this.affectedRows = affectedRows;
+        this.lastInsertId = lastInsertId;
+        this.statusFlag = statusFlag;
+        this.warnings = warnings;
+        this.info = info;
+    }
 
-  public void writeBytes() {
+    public void writeBytes() {
 
-    ByteBuf b = MySQLPacket.initByteBuf();
-    b.writeByte(HEADER);
-    MySQLMessage.writeLength(b, this.affectedRows);
-    MySQLMessage.writeLength(b, this.lastInsertId);
-    b.writeByte(this.statusFlag & 0xff);
-    b.writeByte(this.statusFlag >>> 8);
-    b.writeByte(this.warnings & 0xff);
-    b.writeByte(this.warnings >>> 8);
-    b.writeBytes(info.getBytes());
+        ByteBuf b = MySQLPacket.initByteBuf();
+        b.writeByte(HEADER);
+        MySQLMessage.writeLength(b, this.affectedRows);
+        MySQLMessage.writeLength(b, this.lastInsertId);
+        b.writeByte(this.statusFlag & 0xff);
+        b.writeByte(this.statusFlag >>> 8);
+        b.writeByte(this.warnings & 0xff);
+        b.writeByte(this.warnings >>> 8);
+        b.writeBytes(info.getBytes());
 
-    this.writePacketHeader(b);
-    this.setData(b);
-  }
+        this.writePacketHeader(b);
+        this.setData(b);
+    }
+
+    public static void writeOKPacket(
+            ChannelHandlerContext ctx,
+            int affectedRows,
+            int lastInsertId,
+            int statusFlag,
+            int warnings,
+            String msg) {
+        OkPacket ok = new OkPacket(affectedRows, lastInsertId, statusFlag, warnings, msg);
+        ok.writeBytes();
+        ctx.channel().writeAndFlush(ok.getData());
+        ctx.alloc().buffer().clear();
+    }
 }
